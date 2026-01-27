@@ -1,11 +1,11 @@
 import { Routes, Route } from 'react-router-dom';
 
 // Public Pages
-import Home from './pages/public/Home';
+import NewHome from './pages/public/NewHome';
 import Projects from './pages/public/Projects';
 import ProjectDetail from './pages/public/ProjectDetail';
-import Skills from './pages/public/Skills';
-import Experience from './pages/public/Experience';
+import SkillsNew from './pages/public/SkillsNew';
+import ExperienceNew from './pages/public/ExperienceNew';
 
 // Admin Pages
 import Login from './pages/admin/Login';
@@ -23,11 +23,11 @@ function App() {
   return (
     <Routes>
       {/* Public Routes */}
-      <Route path="/" element={<Home />} />
+      <Route path="/" element={<NewHome />} />
       <Route path="/projects" element={<Projects />} />
       <Route path="/projects/:id" element={<ProjectDetail />} />
-      <Route path="/skills" element={<Skills />} />
-      <Route path="/experience" element={<Experience />} />
+      <Route path="/skills" element={<SkillsNew />} />
+      <Route path="/experience" element={<ExperienceNew />} />
 
       {/* Admin Login (public) */}
       <Route path="/admin/login" element={<Login />} />
@@ -44,7 +44,7 @@ function App() {
       </Route>
 
       {/* 404 - Catch all */}
-      <Route path="*" element={<Home />} />
+      <Route path="*" element={<NewHome />} />
     </Routes>
   );
 }

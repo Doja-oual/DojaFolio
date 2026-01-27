@@ -1,6 +1,6 @@
 import { X } from 'lucide-react';
 import { useEffect } from 'react';
-
+//popup qui vu  donne  top layer.
 const Modal = ({ isOpen, onClose, title, children }) => {
   useEffect(() => {
     const handleEscape = (e) => {

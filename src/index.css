@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -14,4 +14,16 @@ body {
   font-family: 'Inter', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: #0d0f10;
+  color: #f8f9fa;
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-gradient-to-r from-orange-500 via-orange-400 to-orange-600 bg-clip-text text-transparent;
+  }
+
+  .glass-effect {
+    @apply bg-white/5 backdrop-blur-lg border border-white/10;
+  }
 }

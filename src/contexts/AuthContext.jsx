@@ -11,14 +11,16 @@ export const AuthProvider = ({children}) => {
   const [loading,setLoading]= useState (true);
   const [token,setToken]= useState (null);
 
-  const [loginMutation] = useMutation (LOGIN);
+  const [loginMutation] = useMutation (LOGIN); // funcition qui envoie login req a grapfgl
 
   useEffect(()=>{
+  
     const storedToken = localStorage.getItem("token");// verifie sision token existe
     if(storedToken){
       try{
         const decoded =jwtDecode(storedToken);
         if(decoded.exp * 1000 > Date.now()){
+          //update state 
           setUser (decoded);
           setToken (storedToken);
         }else{

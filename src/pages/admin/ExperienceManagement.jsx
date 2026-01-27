@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { useQuery, useMutation } from '@apollo/client';
+import { motion } from 'framer-motion';
 import { GET_EXPERIENCES, GET_COMPETENCES } from '../../services/queries';
 import { CREATE_EXPERIENCE, UPDATE_EXPERIENCE, DELETE_EXPERIENCE } from '../../services/mutations';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import Modal from '../../components/common/Modal';
-import { Plus, Edit, Trash2, Save, Briefcase } from 'lucide-react';
+import { Plus, Edit, Trash2, Save, Briefcase, MapPin, Calendar } from 'lucide-react';
 
 const ExperienceManagement = () => {
   const { loading, error, data, refetch } = useQuery(GET_EXPERIENCES);
@@ -77,9 +78,9 @@ const ExperienceManagement = () => {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData(prev => ({ 
-      ...prev, 
-      [name]: type === 'checkbox' ? checked : value 
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
     }));
   };
 
@@ -122,7 +123,7 @@ const ExperienceManagement = () => {
       handleCloseModal();
     } catch (err) {
       console.error('Error saving experience:', err);
-      alert('Erreur lors de la sauvegarde de l\'expérience');
+      alert('Error saving experience');
     }
   };
 
@@ -133,306 +134,359 @@ const ExperienceManagement = () => {
       setDeleteConfirm(null);
     } catch (err) {
       console.error('Error deleting experience:', err);
-      alert('Erreur lors de la suppression de l\'expérience');
+      alert('Error deleting experience');
     }
   };
 
-  if (loading) return <LoadingSpinner />;
-  if (error) return <div className="p-8 text-red-600">Erreur: {error.message}</div>;
+  if (loading) return <div className="flex justify-center items-center min-h-screen"><LoadingSpinner /></div>;
+  if (error) return <div className="p-8 text-red-400">Error: {error.message}</div>;
 
   const experiences = data?.getExperiences || [];
   const competences = competencesData?.getCompetences || [];
 
   const typeLabels = {
-    CDI: 'CDI',
-    CDD: 'CDD',
+    CDI: 'Full-time',
+    CDD: 'Contract',
     FREELANCE: 'Freelance',
-    STAGE: 'Stage',
-    ALTERNANCE: 'Alternance'
+    STAGE: 'Internship',
+    ALTERNANCE: 'Apprenticeship'
   };
 
   const typeColors = {
-    CDI: 'bg-green-100 text-green-700',
-    CDD: 'bg-blue-100 text-blue-700',
-    FREELANCE: 'bg-purple-100 text-purple-700',
-    STAGE: 'bg-yellow-100 text-yellow-700',
-    ALTERNANCE: 'bg-orange-100 text-orange-700'
+    CDI: 'bg-green-500/10 text-green-400 border-green-500/30',
+    CDD: 'bg-blue-500/10 text-blue-400 border-blue-500/30',
+    FREELANCE: 'bg-purple-500/10 text-purple-400 border-purple-500/30',
+    STAGE: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/30',
+    ALTERNANCE: 'bg-primary-orange-500/10 text-primary-orange-400 border-primary-orange-500/30'
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-3xl font-bold text-gray-900">Gestion des Expériences</h1>
-          <button
-            onClick={() => handleOpenModal()}
-            className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+    <div>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex items-center justify-between mb-8"
+      >
+        <h1 className="text-4xl font-display font-bold text-white">
+          Experience <span className="text-gradient">Management</span>
+        </h1>
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => handleOpenModal()}
+          className="flex items-center gap-2 bg-primary-orange-500 text-white px-6 py-3 rounded-xl hover:bg-primary-orange-600 transition-all shadow-lg shadow-primary-orange-500/30 font-medium"
+        >
+          <Plus className="w-5 h-5" />
+          New Experience
+        </motion.button>
+      </motion.div>
+
+      {/* Experiences List */}
+      <div className="space-y-5">
+        {experiences.map((exp, idx) => (
+          <motion.div
+            key={exp.id}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: idx * 0.1 }}
+            className="glass-effect rounded-2xl p-6 border border-primary-grey-800 hover:border-primary-orange-500/50 transition-all"
           >
-            <Plus className="w-5 h-5" />
-            Nouvelle Expérience
-          </button>
-        </div>
-
-        {/* Experiences List */}
-        <div className="space-y-4">
-          {experiences.map((exp) => (
-            <div key={exp.id} className="bg-white rounded-lg shadow-md p-6">
-              <div className="flex items-start justify-between">
-                <div className="flex gap-4 flex-1">
-                  {exp.logo && (
-                    <img src={exp.logo} alt={exp.entreprise} className="w-16 h-16 object-contain rounded" />
-                  )}
-                  {!exp.logo && (
-                    <div className="w-16 h-16 bg-gray-100 rounded flex items-center justify-center">
-                      <Briefcase className="w-8 h-8 text-gray-400" />
-                    </div>
-                  )}
-                  
-                  <div className="flex-1">
-                    <div className="flex items-start justify-between mb-2">
-                      <div>
-                        <h3 className="text-xl font-semibold">{exp.poste}</h3>
-                        <p className="text-gray-600">{exp.entreprise} {exp.lieu && `• ${exp.lieu}`}</p>
-                      </div>
-                      <span className={`px-3 py-1 text-sm rounded ${typeColors[exp.type]}`}>
-                        {typeLabels[exp.type]}
-                      </span>
-                    </div>
-
-                    <p className="text-sm text-gray-500 mb-3">
-                      {new Date(exp.dateDebut).toLocaleDateString('fr-FR', { month: 'short', year: 'numeric' })}
-                      {' - '}
-                      {exp.enCours ? 'Aujourd\'hui' : new Date(exp.dateFin).toLocaleDateString('fr-FR', { month: 'short', year: 'numeric' })}
-                    </p>
-
-                    <p className="text-gray-700 mb-3">{exp.description}</p>
-
-                    <div className="flex flex-wrap gap-2">
-                      {exp.competences?.map((comp) => (
-                        <span key={comp.id} className="px-2 py-1 bg-blue-50 text-blue-700 text-xs rounded">
-                          {comp.nom}
-                        </span>
-                      ))}
-                    </div>
+            <div className="flex items-start gap-4">
+              {/* Logo */}
+              <div className="flex-shrink-0">
+                {exp.logo ? (
+                  <div className="w-16 h-16 glass-effect rounded-xl p-2 border border-primary-grey-800">
+                    <img src={exp.logo} alt={exp.entreprise} className="w-full h-full object-contain" />
                   </div>
+                ) : (
+                  <div className="w-16 h-16 glass-effect rounded-xl flex items-center justify-center border border-primary-grey-800">
+                    <Briefcase className="w-8 h-8 text-primary-orange-500" />
+                  </div>
+                )}
+              </div>
+
+              {/* Content */}
+              <div className="flex-1">
+                <div className="flex items-start justify-between mb-3">
+                  <div>
+                    <h3 className="text-2xl font-bold text-white mb-1">{exp.poste}</h3>
+                    <p className="text-primary-grey-300 text-lg flex items-center gap-2">
+                      {exp.entreprise}
+                      {exp.lieu && (
+                        <>
+                          <span className="text-primary-grey-600">•</span>
+                          <span className="flex items-center gap-1">
+                            <MapPin className="w-4 h-4" />
+                            {exp.lieu}
+                          </span>
+                        </>
+                      )}
+                    </p>
+                  </div>
+                  <span className={`px-3 py-1 text-sm rounded-full border ${typeColors[exp.type]}`}>
+                    {typeLabels[exp.type]}
+                  </span>
                 </div>
 
-                <div className="flex gap-2 ml-4">
-                  <button
+                {/* Date */}
+                <div className="flex items-center gap-2 text-sm text-primary-grey-400 mb-4">
+                  <Calendar className="w-4 h-4" />
+                  <span>
+                    {new Date(exp.dateDebut).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+                    {' - '}
+                    {exp.enCours ? (
+                      <span className="text-primary-orange-500 font-semibold">Present</span>
+                    ) : (
+                      new Date(exp.dateFin).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+                    )}
+                  </span>
+                </div>
+
+                {/* Description */}
+                <p className="text-primary-grey-300 mb-4 leading-relaxed">{exp.description}</p>
+
+                {/* Skills */}
+                {exp.competences && exp.competences.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {exp.competences.map((comp) => (
+                      <span
+                        key={comp.id}
+                        className="px-3 py-1 glass-effect text-primary-orange-400 text-xs rounded-full border border-primary-orange-500/30"
+                      >
+                        {comp.nom}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                {/* Actions */}
+                <div className="flex gap-2">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
                     onClick={() => handleOpenModal(exp)}
-                    className="p-2 text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                    className="flex items-center gap-1 px-4 py-2 glass-effect text-primary-orange-500 hover:bg-primary-orange-500/10 rounded-lg text-sm transition-all border border-primary-orange-500/30"
                   >
-                    <Edit className="w-5 h-5" />
-                  </button>
-                  <button
+                    <Edit className="w-4 h-4" />
+                    Edit
+                  </motion.button>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
                     onClick={() => setDeleteConfirm(exp)}
-                    className="p-2 text-red-600 hover:bg-red-50 rounded transition-colors"
+                    className="flex items-center gap-1 px-4 py-2 glass-effect text-red-400 hover:bg-red-500/10 rounded-lg text-sm transition-all border border-red-500/30"
                   >
-                    <Trash2 className="w-5 h-5" />
-                  </button>
+                    <Trash2 className="w-4 h-4" />
+                    Delete
+                  </motion.button>
                 </div>
               </div>
             </div>
-          ))}
-        </div>
+          </motion.div>
+        ))}
+      </div>
 
-        {experiences.length === 0 && (
-          <div className="text-center py-12 text-gray-500 bg-white rounded-lg">
-            Aucune expérience pour le moment. Cliquez sur "Nouvelle Expérience" pour commencer.
-          </div>
-        )}
+      {experiences.length === 0 && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="text-center py-16 text-primary-grey-400 glass-effect rounded-2xl border border-primary-grey-800"
+        >
+          <Briefcase className="w-16 h-16 mx-auto mb-4 text-primary-grey-600" />
+          <p className="text-lg">No experience yet. Click "New Experience" to get started.</p>
+        </motion.div>
+      )}
 
-        {/* Add/Edit Modal */}
-        <Modal isOpen={isModalOpen} onClose={handleCloseModal} title={editingExp ? 'Modifier l\'expérience' : 'Nouvelle expérience'}>
-          <form onSubmit={handleSubmit} className="space-y-4 max-h-[70vh] overflow-y-auto">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Entreprise *</label>
-                <input
-                  type="text"
-                  name="entreprise"
-                  value={formData.entreprise}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Poste *</label>
-                <input
-                  type="text"
-                  name="poste"
-                  value={formData.poste}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-            </div>
-
+      {/* Add/Edit Modal */}
+      <Modal isOpen={isModalOpen} onClose={handleCloseModal} title={editingExp ? 'Edit Experience' : 'New Experience'}>
+        <form onSubmit={handleSubmit} className="space-y-5 max-h-[70vh] overflow-y-auto">
+          <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Description *</label>
-              <textarea
-                name="description"
-                value={formData.description}
+              <label className="block text-sm font-medium text-gray-700 mb-2">Company *</label>
+              <input
+                type="text"
+                name="entreprise"
+                value={formData.entreprise}
                 onChange={handleChange}
                 required
-                rows="3"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-orange-500 focus:border-transparent transition-all"
               />
             </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Type *</label>
-                <select
-                  name="type"
-                  value={formData.type}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="CDI">CDI</option>
-                  <option value="CDD">CDD</option>
-                  <option value="FREELANCE">Freelance</option>
-                  <option value="STAGE">Stage</option>
-                  <option value="ALTERNANCE">Alternance</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Lieu</label>
-                <input
-                  type="text"
-                  name="lieu"
-                  value={formData.lieu}
-                  onChange={handleChange}
-                  placeholder="Paris, France"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-            </div>
-
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Compétences utilisées</label>
-              <div className="max-h-40 overflow-y-auto border border-gray-300 rounded-md p-2">
-                {competences.map((comp) => (
-                  <label key={comp.id} className="flex items-center gap-2 p-1 hover:bg-gray-50">
-                    <input
-                      type="checkbox"
-                      checked={formData.competences.includes(comp.id)}
-                      onChange={() => handleCompetenceToggle(comp.id)}
-                      className="rounded"
-                    />
-                    <span className="text-sm">{comp.nom}</span>
-                  </label>
-                ))}
-              </div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Position *</label>
+              <input
+                type="text"
+                name="poste"
+                value={formData.poste}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-orange-500 focus:border-transparent transition-all"
+              />
             </div>
+          </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Date de début *</label>
-                <input
-                  type="date"
-                  name="dateDebut"
-                  value={formData.dateDebut}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Date de fin</label>
-                <input
-                  type="date"
-                  name="dateFin"
-                  value={formData.dateFin}
-                  onChange={handleChange}
-                  disabled={formData.enCours}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
-                />
-              </div>
-            </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Description *</label>
+            <textarea
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              required
+              rows="3"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-orange-500 focus:border-transparent transition-all"
+            />
+          </div>
 
+          <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  name="enCours"
-                  checked={formData.enCours}
-                  onChange={handleChange}
-                  className="rounded"
-                />
-                <span className="text-sm font-medium text-gray-700">Poste actuel</span>
-              </label>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Logo (URL)</label>
-                <input
-                  type="url"
-                  name="logo"
-                  value={formData.logo}
-                  onChange={handleChange}
-                  placeholder="https://..."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Ordre</label>
-                <input
-                  type="number"
-                  name="ordre"
-                  value={formData.ordre}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-            </div>
-
-            <div className="flex gap-2 pt-4">
-              <button
-                type="button"
-                onClick={handleCloseModal}
-                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+              <label className="block text-sm font-medium text-gray-700 mb-2">Type *</label>
+              <select
+                name="type"
+                value={formData.type}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-orange-500 focus:border-transparent transition-all"
               >
-                Annuler
-              </button>
-              <button
-                type="submit"
-                className="flex-1 flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-              >
-                <Save className="w-4 h-4" />
-                Enregistrer
-              </button>
+                <option value="CDI">Full-time</option>
+                <option value="CDD">Contract</option>
+                <option value="FREELANCE">Freelance</option>
+                <option value="STAGE">Internship</option>
+                <option value="ALTERNANCE">Apprenticeship</option>
+              </select>
             </div>
-          </form>
-        </Modal>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Location</label>
+              <input
+                type="text"
+                name="lieu"
+                value={formData.lieu}
+                onChange={handleChange}
+                placeholder="Paris, France"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-orange-500 focus:border-transparent transition-all"
+              />
+            </div>
+          </div>
 
-        {/* Delete Confirmation Modal */}
-        <Modal
-          isOpen={!!deleteConfirm}
-          onClose={() => setDeleteConfirm(null)}
-          title="Confirmer la suppression"
-        >
-          <p className="mb-4">Êtes-vous sûr de vouloir supprimer l'expérience "{deleteConfirm?.poste}" chez {deleteConfirm?.entreprise} ?</p>
-          <div className="flex gap-2">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Skills Used</label>
+            <div className="max-h-40 overflow-y-auto border border-gray-300 rounded-lg p-3 bg-gray-50">
+              {competences.map((comp) => (
+                <label key={comp.id} className="flex items-center gap-2 p-2 hover:bg-white rounded cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={formData.competences.includes(comp.id)}
+                    onChange={() => handleCompetenceToggle(comp.id)}
+                    className="rounded text-primary-orange-500 focus:ring-primary-orange-500"
+                  />
+                  <span className="text-sm text-gray-900">{comp.nom}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Start Date *</label>
+              <input
+                type="date"
+                name="dateDebut"
+                value={formData.dateDebut}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-orange-500 focus:border-transparent transition-all"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">End Date</label>
+              <input
+                type="date"
+                name="dateFin"
+                value={formData.dateFin}
+                onChange={handleChange}
+                disabled={formData.enCours}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-orange-500 focus:border-transparent transition-all disabled:bg-gray-100 disabled:cursor-not-allowed"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                name="enCours"
+                checked={formData.enCours}
+                onChange={handleChange}
+                className="rounded text-primary-orange-500 focus:ring-primary-orange-500"
+              />
+              <span className="text-sm font-medium text-gray-700">Current Position</span>
+            </label>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Logo (URL)</label>
+              <input
+                type="url"
+                name="logo"
+                value={formData.logo}
+                onChange={handleChange}
+                placeholder="https://..."
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-orange-500 focus:border-transparent transition-all"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Order</label>
+              <input
+                type="number"
+                name="ordre"
+                value={formData.ordre}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-orange-500 focus:border-transparent transition-all"
+              />
+            </div>
+          </div>
+
+          <div className="flex gap-3 pt-4">
             <button
-              onClick={() => setDeleteConfirm(null)}
-              className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+              type="button"
+              onClick={handleCloseModal}
+              className="flex-1 px-4 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-all"
             >
-              Annuler
+              Cancel
             </button>
             <button
-              onClick={() => handleDelete(deleteConfirm.id)}
-              className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+              type="submit"
+              className="flex-1 flex items-center justify-center gap-2 bg-primary-orange-500 text-white px-4 py-3 rounded-lg hover:bg-primary-orange-600 font-medium shadow-lg shadow-primary-orange-500/30 transition-all"
             >
-              Supprimer
+              <Save className="w-4 h-4" />
+              Save
             </button>
           </div>
-        </Modal>
-      </div>
+        </form>
+      </Modal>
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        isOpen={!!deleteConfirm}
+        onClose={() => setDeleteConfirm(null)}
+        title="Confirm Deletion"
+      >
+        <p className="mb-6 text-gray-700">Are you sure you want to delete the experience "{deleteConfirm?.poste}" at {deleteConfirm?.entreprise}?</p>
+        <div className="flex gap-3">
+          <button
+            onClick={() => setDeleteConfirm(null)}
+            className="flex-1 px-4 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-all"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={() => handleDelete(deleteConfirm.id)}
+            className="flex-1 px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium shadow-lg shadow-red-500/30 transition-all"
+          >
+            Delete
+          </button>
+        </div>
+      </Modal>
     </div>
   );
 };

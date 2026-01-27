@@ -13,6 +13,7 @@
         "@apollo/client": "^3.8.0",
         "axios": "^1.6.0",
         "date-fns": "^2.30.0",
+        "framer-motion": "^12.23.25",
         "graphql": "^16.8.0",
         "jwt-decode": "^4.0.0",
         "lucide-react": "^0.290.0",
