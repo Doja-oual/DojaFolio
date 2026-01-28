@@ -9,13 +9,13 @@ const SimpleAvatar = () => {
     {
       id: 0,
       name: "Developer Mode",
-      image: "/src/images/3L3A1411_cleaned_and_retouched.jpg",
+      image: "/images/3L3A1411_cleaned_and_retouched.jpg",
       gradient: "from-orange-500 to-orange-600"
     },
     {
       id: 1,
       name: "Creative Mode",
-      image: "/src/images/3L3A1426retouched_.jpg",
+      image: "/images/3L3A1426retouched_.jpg",
       gradient: "from-grey-600 to-orange-500"
     }
   ];
