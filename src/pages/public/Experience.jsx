@@ -125,12 +125,14 @@ const Experience = () => {
                     </div>
 
                     <div className="flex flex-wrap gap-4 text-gray-600 mb-4">
-                      <div className="flex items-center">
-                        <Calendar className="w-4 h-4 mr-2" />
-                        <span>
-                          {formatDate(exp.dateDebut)} - {exp.enCours ? 'Présent' : formatDate(exp.dateFin)}
-                        </span>
-                      </div>
+                      {(formatDate(exp.dateDebut) || exp.enCours) && (
+                        <div className="flex items-center">
+                          <Calendar className="w-4 h-4 mr-2" />
+                          <span>
+                            {formatDate(exp.dateDebut) || 'Date non précisée'} - {exp.enCours ? 'Présent' : (formatDate(exp.dateFin) || 'Date non précisée')}
+                          </span>
+                        </div>
+                      )}
                       {exp.lieu && (
                         <div className="flex items-center">
                           <MapPin className="w-4 h-4 mr-2" />
