@@ -102,15 +102,6 @@ const NewHome = () => {
                 </motion.div>
               ))}
             </div>
-
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Link
-                to="/admin/login"
-                className="bg-primary-orange-500 text-white px-6 py-2 rounded-lg hover:bg-primary-orange-600 transition-all font-medium shadow-lg shadow-primary-orange-500/30"
-              >
-                Admin
-              </Link>
-            </motion.div>
           </div>
         </nav>
       </motion.header>

@@ -44,10 +44,6 @@ const Home = () => {
                 Expérience
               </Link>
             </div>
-            
-            <Link to="/admin/login" className="bg-purple-500 text-white px-6 py-2 rounded-full hover:bg-purple-600 transition-all">
-              Admin
-            </Link>
           </div>
         </nav>
       </header>
