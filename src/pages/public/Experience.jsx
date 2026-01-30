@@ -69,7 +69,11 @@ const Experience = () => {
   };
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('fr-FR', {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return '';
+    
+    return date.toLocaleDateString('fr-FR', {
       month: 'long',
       year: 'numeric'
     });
