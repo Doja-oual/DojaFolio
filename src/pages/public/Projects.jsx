@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery } from '@apollo/client';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -10,6 +10,10 @@ const Projects = () => {
   const { data, loading, error } = useQuery(GET_PROJETS);
   const [filter, setFilter] = useState('ALL');
   const [searchTerm, setSearchTerm] = useState('');
+
+  useEffect(() => {
+    document.title = 'Projets - Khadija Oualla';
+  }, []);
 
   if (loading) {
     return (

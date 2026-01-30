@@ -1,4 +1,5 @@
 import { useQuery } from '@apollo/client';
+import { useEffect } from 'react';
 import { GET_COMPETENCES } from '@/services/queries';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
@@ -7,6 +8,10 @@ import { Code, Database, Server, Cloud, Wrench } from 'lucide-react';
 
 const Skills = () => {
   const { data, loading, error } = useQuery(GET_COMPETENCES);
+
+  useEffect(() => {
+    document.title = 'Compétences - Khadija Oualla';
+  }, []);
 
   if (loading) {
     return (

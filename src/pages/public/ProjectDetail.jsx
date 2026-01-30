@@ -1,6 +1,7 @@
 import { useQuery } from '@apollo/client';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useEffect } from 'react';
 import { GET_PROJET } from '@/services/queries';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import { ArrowLeft, Calendar, ExternalLink, Github, Tag, Clock } from 'lucide-react';
@@ -11,6 +12,14 @@ const ProjectDetail = () => {
   const { data, loading, error } = useQuery(GET_PROJET, {
     variables: { id },
   });
+
+  const projet = data?.getProjet;
+
+  useEffect(() => {
+    if (projet) {
+      document.title = `${projet.titre} - Khadija Oualla`;
+    }
+  }, [projet]);
 
   if (loading) {
     return (

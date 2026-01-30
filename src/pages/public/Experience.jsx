@@ -1,4 +1,5 @@
 import { useQuery } from '@apollo/client';
+import { useEffect } from 'react';
 import { GET_EXPERIENCES } from '@/services/queries';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
@@ -7,6 +8,10 @@ import { Briefcase, Calendar, MapPin, CheckCircle2 } from 'lucide-react';
 
 const Experience = () => {
   const { data, loading, error } = useQuery(GET_EXPERIENCES);
+
+  useEffect(() => {
+    document.title = 'Expériences - Khadija Oualla';
+  }, []);
 
   if (loading) {
     return (

@@ -1,6 +1,7 @@
 import { useQuery } from '@apollo/client';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useEffect } from 'react';
 import { GET_PORTFOLIO } from '@/services/queries';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import SimpleAvatar from '@/components/SimpleAvatar';
@@ -24,6 +25,10 @@ import {
 
 const NewHome = () => {
   const { data, loading, error } = useQuery(GET_PORTFOLIO);
+
+  useEffect(() => {
+    document.title = 'Khadija Oualla - Portfolio Full Stack Developer';
+  }, []);
 
   if (loading) {
     return (
